@@ -34,7 +34,8 @@ export default function SrtTranslatorPage() {
     return 'Chinese';
   });
   const [progress, setProgress] = useState({ completed: 0, total: 0 });
-  const [batchSize, setBatchSize] = useState(200);
+  const batchSize = 100;
+  const concurrency = 6;
 
   // Handle SRT File Upload
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -74,9 +75,9 @@ export default function SrtTranslatorPage() {
       // Create a new Map to store all translated entries
       const allTranslated = new Map<number, SubtitleEntry>();
 
-      // Process batches concurrently in groups of 3
-      for (let i = 0; i < batches.length; i += 3) {
-        const batchGroup = batches.slice(i, i + 3);
+      // Process batches concurrently
+      for (let i = 0; i < batches.length; i += concurrency) {
+        const batchGroup = batches.slice(i, i + concurrency);
         const translations = await Promise.all(batchGroup.map((batch) => translateBatch(batch)));
 
         // Merge translated batches into the final map
@@ -192,18 +193,6 @@ export default function SrtTranslatorPage() {
         />
       </div>
 
-      {/* Batch Size Selection */}
-      <div className="mt-4">
-        <label className="block font-medium text-gray-700">Batch Size:</label>
-        <input
-          className="border border-gray-300 p-2 w-full rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          type="number"
-          min="1"
-          max="200"
-          value={batchSize}
-          onChange={(e) => setBatchSize(Math.max(1, Math.min(200, parseInt(e.target.value) || 20)))}
-        />
-      </div>
 
       {/* File Upload */}
       <div className="mt-4">
