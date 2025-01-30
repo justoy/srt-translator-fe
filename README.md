@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SRT Translator
+
+A web application for translating SRT subtitle files using LLM AI, e.g., OpenAI gpt-4o-mini. Built with Next.js and TypeScript, this tool helps you easily translate subtitle files while preserving their timing and formatting.
+
+## Features
+
+- 📝 Parse and process SRT subtitle files
+- 🌐 Translate subtitle content while maintaining timing information
+- ⚡ Efficient batch processing for large subtitle files
+- 🎯 Preserves original SRT formatting and structure
+- 💻 Modern web interface built with React and Tailwind CSS
 
 ## Getting Started
 
-First, run the development server:
-
+1. Clone the repository
+2. Install dependencies:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+3. Start the development server:
+```bash
+npm run dev
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+4. Open [http://localhost:3000](http://localhost:3000) with your browser to use the application
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Available Scripts
 
-## Learn More
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
+- `npm run format` - Format code with Prettier
+- `npm run format:check` - Check code formatting
 
-To learn more about Next.js, take a look at the following resources:
+## Project Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+app/
+├── utils/
+│   ├── srtUtils.ts      # SRT parsing and formatting utilities
+│   └── translationProviders.ts  # Translation service integrations
+├── types/
+│   └── *.d.ts          # TypeScript type definitions
+└── page.tsx            # Main application page
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Deployment
 
-## Deploy on Vercel
+This is a Next.js application that can be deployed to any platform that supports Node.js. For the easiest deployment experience, use [Vercel](https://vercel.com), the platform created by the makers of Next.js.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
