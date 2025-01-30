@@ -43,6 +43,19 @@ export function formatSrt(entryMap: Map<number, SubtitleEntry>): string {
     return subtitlesParser.toSrt(subs);    
 }
 
+export function splitIntoBatches(subs: Map<number, SubtitleEntry>, batchSize: number = 200): Map<number, SubtitleEntry>[] {
+  const entries = mapToSortedArray(subs);
+  const batches: Map<number, SubtitleEntry>[] = [];
+  
+  for (let i = 0; i < entries.length; i += batchSize) {
+    const batchEntries = entries.slice(i, i + batchSize);
+    const batchMap = new Map(batchEntries.map(entry => [entry.number, entry]));
+    batches.push(batchMap);
+  }
+  
+  return batches;
+}
+
 export function combineBatchTexts(batchMap: Map<number, SubtitleEntry>): string {
   const batch = mapToSortedArray(batchMap);
   const batchTexts = batch.map(entry => `[${entry.number}] ${entry.text}`);
