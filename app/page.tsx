@@ -1,16 +1,23 @@
-"use client";
+'use client';
 
-import React, { useState, useCallback } from "react";
-import { parseSrt, formatSrt, combineBatchTexts, updateBatchWithTranslations, SubtitleEntry, splitIntoBatches } from "./utils/srtUtils";
-import { providers, getProvider } from "./utils/translationProviders";
+import React, { useState } from 'react';
+import {
+  parseSrt,
+  formatSrt,
+  combineBatchTexts,
+  updateBatchWithTranslations,
+  SubtitleEntry,
+  splitIntoBatches,
+} from './utils/srtUtils';
+import { providers, getProvider } from './utils/translationProviders';
 
 export default function SrtTranslatorPage() {
   const [subs, setSubs] = useState<Map<number, SubtitleEntry>>(new Map());
-  const [provider, setProvider] = useState("openai");
-  const [apiKey, setApiKey] = useState("");
+  const [provider, setProvider] = useState('openai');
+  const [apiKey, setApiKey] = useState('');
   const [translatedSubs, setTranslatedSubs] = useState<Map<number, SubtitleEntry>>(new Map());
   const [isTranslating, setIsTranslating] = useState(false);
-  const [targetLang, setTargetLang] = useState("Chinese");
+  const [targetLang, setTargetLang] = useState('Chinese');
   const [progress, setProgress] = useState({ completed: 0, total: 0 });
   const [batchSize, setBatchSize] = useState(200);
 
@@ -33,11 +40,11 @@ export default function SrtTranslatorPage() {
   };
 
   // Process batch translation
-  const translateBatch = useCallback(async (batch: Map<number, SubtitleEntry>) => {
+  const translateBatch = async (batch: Map<number, SubtitleEntry>) => {
     const batchText = combineBatchTexts(batch);
     const translated = await translateText(batchText);
     return updateBatchWithTranslations(batch, translated);
-  }, [targetLang, provider, apiKey]);
+  };
 
   // Process SRT Translation with batches
   const handleTranslate = async () => {
@@ -47,28 +54,26 @@ export default function SrtTranslatorPage() {
 
     try {
       const batches = splitIntoBatches(subs, batchSize);
-      setProgress(prev => ({ ...prev, total: batches.length }));
+      setProgress((prev) => ({ ...prev, total: batches.length }));
 
       // Create a new Map to store all translated entries
       const allTranslated = new Map<number, SubtitleEntry>();
-      
+
       // Process batches concurrently in groups of 3
       for (let i = 0; i < batches.length; i += 3) {
         const batchGroup = batches.slice(i, i + 3);
-        const translations = await Promise.all(
-          batchGroup.map(batch => translateBatch(batch))
-        );
-        
+        const translations = await Promise.all(batchGroup.map((batch) => translateBatch(batch)));
+
         // Merge translated batches into the final map
-        translations.forEach(translatedBatch => {
+        translations.forEach((translatedBatch) => {
           translatedBatch.forEach((value, key) => {
             allTranslated.set(key, value);
           });
         });
-        
-        setProgress(prev => ({ 
-          ...prev, 
-          completed: Math.min(prev.completed + batchGroup.length, prev.total) 
+
+        setProgress((prev) => ({
+          ...prev,
+          completed: Math.min(prev.completed + batchGroup.length, prev.total),
         }));
       }
 
@@ -84,11 +89,11 @@ export default function SrtTranslatorPage() {
   // Download Translated SRT
   const handleDownload = () => {
     const srtData = formatSrt(translatedSubs);
-    const blob = new Blob([srtData], { type: "text/plain" });
+    const blob = new Blob([srtData], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = url;
-    link.download = "translated_subtitles.srt";
+    link.download = 'translated_subtitles.srt';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -102,9 +107,15 @@ export default function SrtTranslatorPage() {
       {/* Translation Provider Selection */}
       <div className="mt-4">
         <label className="block font-medium">Choose a Translation Provider:</label>
-        <select className="border p-2 w-full" value={provider} onChange={e => setProvider(e.target.value)}>
-          {providers.map(p => (
-            <option key={p.id} value={p.id}>{p.name}</option>
+        <select
+          className="border p-2 w-full"
+          value={provider}
+          onChange={(e) => setProvider(e.target.value)}
+        >
+          {providers.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.name}
+            </option>
           ))}
         </select>
       </div>
@@ -117,7 +128,7 @@ export default function SrtTranslatorPage() {
             className="border p-2 w-full"
             type="text"
             value={apiKey}
-            onChange={e => setApiKey(e.target.value)}
+            onChange={(e) => setApiKey(e.target.value)}
             placeholder="Enter your API key"
           />
         </div>
@@ -130,7 +141,7 @@ export default function SrtTranslatorPage() {
           className="border p-2 w-full"
           type="text"
           value={targetLang}
-          onChange={e => setTargetLang(e.target.value)}
+          onChange={(e) => setTargetLang(e.target.value)}
           placeholder="Enter target language, e.g., Chinese"
         />
       </div>
@@ -144,7 +155,7 @@ export default function SrtTranslatorPage() {
           min="1"
           max="200"
           value={batchSize}
-          onChange={e => setBatchSize(Math.max(1, Math.min(200, parseInt(e.target.value) || 20)))}
+          onChange={(e) => setBatchSize(Math.max(1, Math.min(200, parseInt(e.target.value) || 20)))}
         />
       </div>
 
@@ -168,7 +179,7 @@ export default function SrtTranslatorPage() {
             <span>{Math.round((progress.completed / progress.total) * 100)}%</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2.5">
-            <div 
+            <div
               className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
               style={{ width: `${(progress.completed / progress.total) * 100}%` }}
             ></div>
@@ -183,7 +194,10 @@ export default function SrtTranslatorPage() {
       {translatedSubs.size > 0 && (
         <>
           <p className="mt-4">Translation complete!</p>
-          <button className="mt-2 bg-green-500 text-white px-4 py-2 rounded" onClick={handleDownload}>
+          <button
+            className="mt-2 bg-green-500 text-white px-4 py-2 rounded"
+            onClick={handleDownload}
+          >
             Download Translated SRT
           </button>
         </>

@@ -13,53 +13,55 @@ export function parseSrt(content: string): Map<number, SubtitleEntry> {
 
   const entriesMap: Map<number, SubtitleEntry> = new Map();
 
-  subs.forEach((sub, index) => {
-      const entry: SubtitleEntry = {
-          number: Number(sub.id),
-          startTime: sub.startTime,
-          endTime: sub.endTime,
-          text: sub.text
-      };
-      entriesMap.set(entry.number, entry);
+  subs.forEach((sub) => {
+    const entry: SubtitleEntry = {
+      number: Number(sub.id),
+      startTime: sub.startTime,
+      endTime: sub.endTime,
+      text: sub.text,
+    };
+    entriesMap.set(entry.number, entry);
   });
 
   return entriesMap;
 }
 
-
 export function formatSrt(entryMap: Map<number, SubtitleEntry>): string {
-    /** Format subtitle entries back to SRT format **/    
-    const entries = mapToSortedArray(entryMap);
-    const subs = entries.map(entry => {
-        const [start, end] = [entry.startTime, entry.endTime]
-        return {
-            id: String(entry.number),
-            startTime: start,
-            endTime: end,
-            text: entry.text
-        };
-    });
-    
-    return subtitlesParser.toSrt(subs);    
+  /** Format subtitle entries back to SRT format **/
+  const entries = mapToSortedArray(entryMap);
+  const subs = entries.map((entry) => {
+    const [start, end] = [entry.startTime, entry.endTime];
+    return {
+      id: String(entry.number),
+      startTime: start,
+      endTime: end,
+      text: entry.text,
+    };
+  });
+
+  return subtitlesParser.toSrt(subs);
 }
 
-export function splitIntoBatches(subs: Map<number, SubtitleEntry>, batchSize: number = 200): Map<number, SubtitleEntry>[] {
+export function splitIntoBatches(
+  subs: Map<number, SubtitleEntry>,
+  batchSize: number = 200
+): Map<number, SubtitleEntry>[] {
   const entries = mapToSortedArray(subs);
   const batches: Map<number, SubtitleEntry>[] = [];
-  
+
   for (let i = 0; i < entries.length; i += batchSize) {
     const batchEntries = entries.slice(i, i + batchSize);
-    const batchMap = new Map(batchEntries.map(entry => [entry.number, entry]));
+    const batchMap = new Map(batchEntries.map((entry) => [entry.number, entry]));
     batches.push(batchMap);
   }
-  
+
   return batches;
 }
 
 export function combineBatchTexts(batchMap: Map<number, SubtitleEntry>): string {
   const batch = mapToSortedArray(batchMap);
-  const batchTexts = batch.map(entry => `[${entry.number}] ${entry.text}`);
-  return batchTexts.join("\n");
+  const batchTexts = batch.map((entry) => `[${entry.number}] ${entry.text}`);
+  return batchTexts.join('\n');
 }
 
 export function updateBatchWithTranslations(
@@ -74,7 +76,7 @@ export function updateBatchWithTranslations(
     if (sub) {
       updatedBatch.set(pair.number, {
         ...sub, // Preserve existing startTime and endTime
-        text: pair.text
+        text: pair.text,
       });
     } else {
       console.warn(`Subtitle entry with number ${pair.number} not found in batch.`);
@@ -84,15 +86,13 @@ export function updateBatchWithTranslations(
   return updatedBatch;
 }
 
-
-
 function parseTranslations(text: string): { number: number; text: string }[] {
   const pattern = /\[(\d+)]\s*([\s\S]*?)(?=\n\[\d+]|$)/g;
   const matches = [...text.matchAll(pattern)];
 
-  return matches.map(match => ({
-      number: parseInt(match[1], 10),
-      text: match[2].trim()
+  return matches.map((match) => ({
+    number: parseInt(match[1], 10),
+    text: match[2].trim(),
   }));
 }
 
