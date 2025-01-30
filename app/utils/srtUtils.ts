@@ -54,7 +54,7 @@ export function updateBatchWithTranslations(batch: SubtitleEntry[], translations
 }
 
 function parseTranslations(text: string): { number: number; text: string }[] {
-  const pattern = /\[(\d+)]\s*(.*?)(?=\n\[\d+]|$)/gs;
+  const pattern = /\[(\d+)]\s*([\s\S]*?)(?=\n\[\d+]|$)/g;
   const matches = [...text.matchAll(pattern)];
 
   return matches.map(match => ({
