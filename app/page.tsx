@@ -5,10 +5,10 @@ import { parseSrt, formatSrt, combineBatchTexts, updateBatchWithTranslations, Su
 import { providers, getProvider } from "./utils/translationProviders";
 
 export default function SrtTranslatorPage() {
-  const [subs, setSubs] = useState<SubtitleEntry[]>([]);
+  const [subs, setSubs] = useState<Map<number, SubtitleEntry>>(new Map());
   const [provider, setProvider] = useState("openai");
   const [apiKey, setApiKey] = useState("");
-  const [translatedSubs, setTranslatedSubs] = useState<SubtitleEntry[]>([]);
+  const [translatedSubs, setTranslatedSubs] = useState<Map<number, SubtitleEntry>>(new Map())
   const [isTranslating, setIsTranslating] = useState(false);
   const [targetLang, setTargetLang] = useState("Chinese"); // Default: Chinese
 
@@ -32,7 +32,7 @@ export default function SrtTranslatorPage() {
 
   // Process SRT Translation
   const handleTranslate = async () => {
-    if (subs.length === 0) return;
+    if (subs.size === 0) return;
     setIsTranslating(true);
     console.log(combineBatchTexts(subs));
 
@@ -103,7 +103,7 @@ export default function SrtTranslatorPage() {
       </div>
 
       {/* Translate Button */}
-      {subs.length > 0 && !isTranslating && (
+      {subs.size > 0 && !isTranslating && (
         <button className="mt-4 bg-blue-500 text-white px-4 py-2 rounded" onClick={handleTranslate}>
           Translate SRT
         </button>
@@ -112,7 +112,7 @@ export default function SrtTranslatorPage() {
       {isTranslating && <p className="mt-4">Translating...</p>}
 
       {/* Download Translated File */}
-      {translatedSubs.length > 0 && (
+      {translatedSubs.size > 0 && (
         <>
           <p className="mt-4">Translation complete!</p>
           <button className="mt-2 bg-green-500 text-white px-4 py-2 rounded" onClick={handleDownload}>

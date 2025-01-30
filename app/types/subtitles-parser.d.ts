@@ -1,8 +1,8 @@
 declare module 'subtitles-parser' {
   interface SubtitleItem {
-    id: string | number;
-    startTime: string | number;
-    endTime: string | number;
+    id: string;
+    startTime: string;
+    endTime: string;
     text: string;
   }
 
