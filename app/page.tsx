@@ -116,9 +116,9 @@ export default function SrtTranslatorPage() {
   };
 
   return (
-    <main className="p-5">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">SRT Translator</h1>
+    <main className="p-6 bg-gray-50 min-h-screen">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-3xl font-extrabold text-gray-800">SRT Translator</h1>
         <a 
           href="https://github.com/justoy/srt-translator-fe"
           target="_blank"
@@ -143,9 +143,9 @@ export default function SrtTranslatorPage() {
 
       {/* Translation Provider Selection */}
       <div className="mt-4">
-        <label className="block font-medium">Choose a Translation Provider:</label>
+        <label className="block font-medium text-gray-700">Choose a Translation Provider:</label>
         <select
-          className="border p-2 w-full"
+          className="border border-gray-300 p-2 w-full rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={provider}
           onChange={(e) => {
             setProvider(e.target.value);
@@ -163,9 +163,9 @@ export default function SrtTranslatorPage() {
       {/* API Key Input (Only for OpenAI & DeepSeek) */}
       {getProvider(provider)?.requiresApiKey && (
         <div className="mt-4">
-          <label className="block font-medium">Enter API Key:</label>
+          <label className="block font-medium text-gray-700">Enter API Key:</label>
           <input
-            className="border p-2 w-full"
+            className="border border-gray-300 p-2 w-full rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             type="text"
             value={apiKey}
             onChange={(e) => {
@@ -179,9 +179,9 @@ export default function SrtTranslatorPage() {
 
       {/* Language Selection */}
       <div className="mt-4">
-        <label className="block font-medium">Target Language:</label>
+        <label className="block font-medium text-gray-700">Target Language:</label>
         <input
-          className="border p-2 w-full"
+          className="border border-gray-300 p-2 w-full rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           type="text"
           value={targetLang}
           onChange={(e) => {
@@ -194,9 +194,9 @@ export default function SrtTranslatorPage() {
 
       {/* Batch Size Selection */}
       <div className="mt-4">
-        <label className="block font-medium">Batch Size:</label>
+        <label className="block font-medium text-gray-700">Batch Size:</label>
         <input
-          className="border p-2 w-full"
+          className="border border-gray-300 p-2 w-full rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           type="number"
           min="1"
           max="200"
@@ -207,12 +207,12 @@ export default function SrtTranslatorPage() {
 
       {/* File Upload */}
       <div className="mt-4">
-        <input type="file" accept=".srt" onChange={handleFileUpload} />
+        <input type="file" accept=".srt" onChange={handleFileUpload} className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
       </div>
 
       {/* Translate Button */}
       {subs.size > 0 && !isTranslating && (
-        <button className="mt-4 bg-blue-500 text-white px-4 py-2 rounded" onClick={handleTranslate}>
+        <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md shadow-md hover:bg-blue-700 transition duration-300" onClick={handleTranslate}>
           Translate SRT
         </button>
       )}
@@ -221,8 +221,8 @@ export default function SrtTranslatorPage() {
       {isTranslating && (
         <div className="mt-4">
           <div className="flex justify-between mb-2">
-            <span>Translating...</span>
-            <span>{Math.round((progress.completed / progress.total) * 100)}%</span>
+            <span className="text-gray-700">Translating...</span>
+            <span className="text-gray-700">{Math.round((progress.completed / progress.total) * 100)}%</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2.5">
             <div
@@ -239,9 +239,9 @@ export default function SrtTranslatorPage() {
       {/* Download Translated File */}
       {translatedSubs.size > 0 && (
         <>
-          <p className="mt-4">Translation complete!</p>
+          <p className="mt-4 text-gray-700">Translation complete!</p>
           <button
-            className="mt-2 bg-green-500 text-white px-4 py-2 rounded"
+            className="mt-2 bg-green-600 text-white px-4 py-2 rounded-md shadow-md hover:bg-green-700 transition duration-300"
             onClick={handleDownload}
           >
             Download Translated SRT
