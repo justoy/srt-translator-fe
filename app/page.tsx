@@ -1,16 +1,16 @@
 "use client";
 
 import React, { useState } from "react";
-import { parseSrt, buildSrt } from "./utils/srtUtils";
-import axios from "axios";
+import { parseSrt, formatSrt, combineBatchTexts, updateBatchWithTranslations, SubtitleEntry } from "./utils/srtUtils";
+import { providers, getProvider } from "./utils/translationProviders";
 
 export default function SrtTranslatorPage() {
-  const [subs, setSubs] = useState<any[]>([]);
+  const [subs, setSubs] = useState<SubtitleEntry[]>([]);
   const [provider, setProvider] = useState("openai");
   const [apiKey, setApiKey] = useState("");
-  const [translatedSubs, setTranslatedSubs] = useState<any[]>([]);
+  const [translatedSubs, setTranslatedSubs] = useState<SubtitleEntry[]>([]);
   const [isTranslating, setIsTranslating] = useState(false);
-  const [targetLang, setTargetLang] = useState("es"); // Default: Spanish
+  const [targetLang, setTargetLang] = useState("Chinese"); // Default: Chinese
 
   // Handle SRT File Upload
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -23,54 +23,29 @@ export default function SrtTranslatorPage() {
 
   // Translation function
   const translateText = async (text: string) => {
-    if (provider === "openai") {
-      // OpenAI API
-      const response = await axios.post(
-        "https://api.openai.com/v1/chat/completions",
-        {
-          model: "gpt-4o-mini",
-          messages: [{ role: "user", content: `Translate this to ${targetLang}: ${text}` }],
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${apiKey}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      return response.data.choices?.[0]?.message?.content || text;
+    const selectedProvider = getProvider(provider);
+    if (!selectedProvider) {
+      throw new Error(`Provider ${provider} not found`);
     }
-
-    if (provider === "deepseek") {
-      // DeepSeek API
-      const response = await axios.post(
-        "https://api.deepseek.com/v1/translate",
-        { text, target_lang: targetLang },
-        { headers: { Authorization: `Bearer ${apiKey}` } }
-      );
-      return response.data.translated_text || text;
-    }
+    return selectedProvider.translate(text, targetLang, apiKey);
   };
 
   // Process SRT Translation
   const handleTranslate = async () => {
     if (subs.length === 0) return;
     setIsTranslating(true);
+    console.log(combineBatchTexts(subs));
 
-    const translated = await Promise.all(
-      subs.map(async (line) => ({
-        ...line,
-        text: await translateText(line.text),
-      }))
-    );
+    const translated = await translateText(combineBatchTexts(subs));
 
-    setTranslatedSubs(translated);
+    console.log('translated: \n', translated);
+    setTranslatedSubs(updateBatchWithTranslations(subs, translated));
     setIsTranslating(false);
   };
 
   // Download Translated SRT
   const handleDownload = () => {
-    const srtData = buildSrt(translatedSubs);
+    const srtData = formatSrt(translatedSubs);
     const blob = new Blob([srtData], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -90,13 +65,14 @@ export default function SrtTranslatorPage() {
       <div className="mt-4">
         <label className="block font-medium">Choose a Translation Provider:</label>
         <select className="border p-2 w-full" value={provider} onChange={e => setProvider(e.target.value)}>
-          <option value="openai">OpenAI</option>
-          <option value="deepseek">DeepSeek</option>
+          {providers.map(p => (
+            <option key={p.id} value={p.id}>{p.name}</option>
+          ))}
         </select>
       </div>
 
       {/* API Key Input (Only for OpenAI & DeepSeek) */}
-      {(provider === "openai" || provider === "deepseek") && (
+      {getProvider(provider)?.requiresApiKey && (
         <div className="mt-4">
           <label className="block font-medium">Enter API Key:</label>
           <input
@@ -117,7 +93,7 @@ export default function SrtTranslatorPage() {
           type="text"
           value={targetLang}
           onChange={e => setTargetLang(e.target.value)}
-          placeholder="Enter target language code (e.g., es, fr, de)"
+          placeholder="Enter target language, e.g., Chinese"
         />
       </div>
 
