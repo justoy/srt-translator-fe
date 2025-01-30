@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   parseSrt,
   formatSrt,
@@ -13,11 +13,26 @@ import { providers, getProvider } from './utils/translationProviders';
 
 export default function SrtTranslatorPage() {
   const [subs, setSubs] = useState<Map<number, SubtitleEntry>>(new Map());
-  const [provider, setProvider] = useState('openai');
-  const [apiKey, setApiKey] = useState('');
+  const [provider, setProvider] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('srtTranslator_provider') || 'openai';
+    }
+    return 'openai';
+  });
+  const [apiKey, setApiKey] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('srtTranslator_apiKey') || '';
+    }
+    return '';
+  });
   const [translatedSubs, setTranslatedSubs] = useState<Map<number, SubtitleEntry>>(new Map());
   const [isTranslating, setIsTranslating] = useState(false);
-  const [targetLang, setTargetLang] = useState('Chinese');
+  const [targetLang, setTargetLang] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('srtTranslator_targetLang') || 'Chinese';
+    }
+    return 'Chinese';
+  });
   const [progress, setProgress] = useState({ completed: 0, total: 0 });
   const [batchSize, setBatchSize] = useState(200);
 
@@ -110,7 +125,10 @@ export default function SrtTranslatorPage() {
         <select
           className="border p-2 w-full"
           value={provider}
-          onChange={(e) => setProvider(e.target.value)}
+          onChange={(e) => {
+            setProvider(e.target.value);
+            localStorage.setItem('srtTranslator_provider', e.target.value);
+          }}
         >
           {providers.map((p) => (
             <option key={p.id} value={p.id}>
@@ -128,7 +146,10 @@ export default function SrtTranslatorPage() {
             className="border p-2 w-full"
             type="text"
             value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
+            onChange={(e) => {
+              setApiKey(e.target.value);
+              localStorage.setItem('srtTranslator_apiKey', e.target.value);
+            }}
             placeholder="Enter your API key"
           />
         </div>
@@ -141,7 +162,10 @@ export default function SrtTranslatorPage() {
           className="border p-2 w-full"
           type="text"
           value={targetLang}
-          onChange={(e) => setTargetLang(e.target.value)}
+          onChange={(e) => {
+            setTargetLang(e.target.value);
+            localStorage.setItem('srtTranslator_targetLang', e.target.value);
+          }}
           placeholder="Enter target language, e.g., Chinese"
         />
       </div>
