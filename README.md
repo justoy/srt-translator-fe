@@ -2,6 +2,10 @@
 
 A web application for translating SRT subtitle files using LLM AI, e.g., OpenAI gpt-4o-mini. Built with Next.js and TypeScript, this tool helps you easily translate subtitle files while preserving their timing and formatting.
 
+The free web app is available on https://www.llmtranslatesrt.online 
+
+![alt text](homepage.png)
+
 ## Features
 
 - 📝 Parse and process SRT subtitle files
@@ -12,7 +16,10 @@ A web application for translating SRT subtitle files using LLM AI, e.g., OpenAI 
 
 ## Getting Started
 
-1. Clone the repository
+1. Clone the repository:
+```bash
+git clone git@github.com:justoy/srt-translator-fe.git
+```
 2. Install dependencies:
 ```bash
 npm install
