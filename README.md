@@ -4,6 +4,8 @@ A web application for translating SRT subtitle files using LLM AI, e.g., OpenAI 
 
 The free web app is available on https://www.llmtranslatesrt.online 
 
+![alt text](homepage.png)
+
 ## Features
 
 - 📝 Parse and process SRT subtitle files
