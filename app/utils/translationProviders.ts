@@ -66,7 +66,7 @@ export const providers: TranslationProvider[] = [
     'deepseek',
     'DeepSeek',
     'https://api.deepseek.com/chat/completions',
-    'deepseek-chat'
+    'deepseek-v4-flash'
   ),
 ];
 
