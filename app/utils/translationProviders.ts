@@ -1,16 +1,20 @@
 import axios from 'axios';
 
-function createTranslationMessages(text: string, targetLanguage: string) {
-  return [
-    {
-      role: 'system',
-      content: `You are a translator. Translate the following subtitles to ${targetLanguage}.
+function createTranslationSystemInstruction(targetLanguage: string) {
+  return `You are a translator. Translate the following subtitles to ${targetLanguage}.
 Rules:
 - Maintain the same tone and meaning
 - Keep the [number] prefix for each line
 - Translate only the text after the [number]
 - Preserve line breaks
-- Only respond with the translations, no explanations`,
+- Only respond with the translations, no explanations`;
+}
+
+function createTranslationMessages(text: string, targetLanguage: string) {
+  return [
+    {
+      role: 'system',
+      content: createTranslationSystemInstruction(targetLanguage),
     },
     {
       role: 'user',
@@ -54,6 +58,50 @@ const createTranslationProvider = (
   },
 });
 
+const createGeminiTranslationProvider = (
+  id: string,
+  name: string,
+  apiBaseUrl: string,
+  model: string
+): TranslationProvider => ({
+  id,
+  name,
+  requiresApiKey: true,
+  translate: async (text: string, targetLang: string, apiKey: string) => {
+    const response = await axios.post(
+      `${apiBaseUrl}/models/${model}:generateContent`,
+      {
+        systemInstruction: {
+          parts: [{ text: createTranslationSystemInstruction(targetLang) }],
+        },
+        contents: [
+          {
+            role: 'user',
+            parts: [{ text }],
+          },
+        ],
+      },
+      {
+        headers: {
+          'x-goog-api-key': apiKey,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    const translatedText = response.data.candidates?.[0]?.content?.parts
+      ?.map((part: { text?: string }) => part.text)
+      .filter(Boolean)
+      .join('\n');
+
+    if (!translatedText) {
+      throw new Error('Gemini response did not include translated text');
+    }
+
+    return translatedText;
+  },
+});
+
 // Define providers using the reusable function
 export const providers: TranslationProvider[] = [
   createTranslationProvider(
@@ -67,6 +115,12 @@ export const providers: TranslationProvider[] = [
     'DeepSeek',
     'https://api.deepseek.com/chat/completions',
     'deepseek-v4-flash'
+  ),
+  createGeminiTranslationProvider(
+    'gemini',
+    'Google Gemini',
+    'https://generativelanguage.googleapis.com/v1beta',
+    'gemini-3.1-flash-lite'
   ),
 ];
 

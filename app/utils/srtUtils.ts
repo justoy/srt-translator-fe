@@ -69,6 +69,11 @@ export function updateBatchWithTranslations(
   translations: string
 ): Map<number, SubtitleEntry> {
   const translatedPairs = parseTranslations(translations);
+
+  if (translatedPairs.length === 0) {
+    throw new Error('Translation response did not include any numbered subtitle entries.');
+  }
+
   const updatedBatch = new Map(batchMap); // Clone the original batch to avoid mutation
 
   translatedPairs.forEach((pair) => {
