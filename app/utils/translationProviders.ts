@@ -60,7 +60,7 @@ export const providers: TranslationProvider[] = [
     'openai',
     'OpenAI',
     'https://api.openai.com/v1/chat/completions',
-    'gpt-4o'
+    'gpt-5.4-mini'
   ),
   createTranslationProvider(
     'deepseek',
